@@ -68,6 +68,7 @@ public class QuicksearchUI extends Screen {
     public InputMode currentMode = InputMode.NONE;
     public String output = null;
     public ArrayList<SearchResult> resultArrayList = new ArrayList<>();
+    public ClipStack clipStack = new ClipStack();
 
     private void inputChanged(String s) {
         output = null;
@@ -147,17 +148,15 @@ public class QuicksearchUI extends Screen {
         } else {
             if(currentMode == InputMode.SEARCH) {
 
-                ScissorManager.push((int) search_width + (this.width / 2), (int) (bottomCorner.y+(5*(search_height+1))), (int) search_width, (int) this.height - (this.height / 2));
-
-                DrawableHelper.fill(matrices, 0, 0, this.width, this.height, 0xFFFFFFFF);
+                clipStack.use(matrices, new Rectangle(topCorner.x, bottomCorner.y + 1, search_width, search_height*5), () -> {
+                    DrawableHelper.fill(matrices, 0, 0, this.width, this.height, 0xFFFFFFFF);
+                });
 
                 for (int i = 1; i < resultArrayList.size() + 1; i++) {
                     DrawableHelper.fill(matrices, topCorner.x, (int) ((topCorner.y+1+(i*(search_height+1)))+scrollOffset), bottomCorner.x, (int) ((bottomCorner.y+1+(i*(search_height+1)))+scrollOffset), 0xFF191414);
                     SearchResult result = resultArrayList.get(i-1);
                     this.textRenderer.drawWithShadow(matrices, result.getName(), topCorner.x - search_width + 5, ((topCorner.y+1+(i*(search_height+1))) - ((search_height+1) - (this.textRenderer.fontHeight)))+scrollOffset, Formatting.GRAY.getColorValue());
                 }
-
-                ScissorManager.pop();
             }
         }
 
