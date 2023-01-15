@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "quicksearch",
+  "version": "${version}",
+  "name": "QuickSearch",
+  "description": "Adds a spotlight search bar. Useful for quick calculations, searching for recipes and more.",
+  "authors": [
+    "mineblock11"
+  ],
+  "contact": {
+    "website": "https://mineblock11.dev/",
+    "repo": "https://github.com/mineblock11/quicksearch"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/quicksearch/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "mine.block.quicksearch.client.QuicksearchClient"
+    ]
+  },
+  "mixins": [
+    "quicksearch.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.12",
+    "fabric": "*",
+    "minecraft": "1.19.3"
+  }
+}
