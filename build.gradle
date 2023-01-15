@@ -10,6 +10,11 @@ repositories {
     maven { url 'https://maven.gegy.dev' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.terraformersmc.com/' }
+    maven { url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -25,7 +30,8 @@ dependencies {
     include modImplementation("dev.lambdaurora:spruceui:${project.spruceui_version}")
     include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
 
-    modImplementation "dev.emi:emi:${emi_version}"
+    modCompileOnly "dev.emi:emi:${emi_version}"
+    modCompileOnly "curse.maven:jei-238222:4239205"
 }
 
 processResources {
