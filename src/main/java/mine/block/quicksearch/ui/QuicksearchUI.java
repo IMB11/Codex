@@ -14,6 +14,7 @@ import mine.block.quicksearch.math.FunctionRegistry;
 import mine.block.quicksearch.search.SearchManager;
 import mine.block.quicksearch.search.SearchResult;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -76,11 +77,14 @@ public class QuicksearchUI extends SpruceScreen {
 
     public InputMode currentMode = InputMode.NONE;
     public String output = null;
-    public ArrayList<SearchItemWidget> resultArrayList = new ArrayList<>();
+    public ArrayList<SearchEntryWidget> resultArrayList = new ArrayList<>();
 
     private void inputChanged(String s) {
         output = null;
-        resultArrayList.clear();
+        if(!resultArrayList.isEmpty()) {
+            resultArrayList.forEach(this::remove);
+            resultArrayList.clear();
+        }
         if(s.startsWith("=")) {
             currentMode = InputMode.MATH;
 
@@ -120,7 +124,12 @@ public class QuicksearchUI extends SpruceScreen {
             for (String key : keys) {
                 if(key.contains(s)) {
                     // DrawableHelper.fill(matrices, topCorner.x, (int) ((topCorner.y+1+(i*(search_height+1)))+scrollOffset), bottomCorner.x, (int) ((bottomCorner.y+1+(i*(search_height+1)))+scrollOffset), 0xFF191414);
-                    resultArrayList.add(new SearchItemWidget(this, SearchManager.SEARCH_MAP.get(key), i));
+                    var widget = new SearchEntryWidget(this, SearchManager.SEARCH_MAP.get(key), (int) search_width, (int) search_height);
+                    resultArrayList.add(widget);
+                    widget.visible = true;
+                    widget.setY((int) (search_height * i));
+                    widget.setX(topCorner.x);
+                    this.addDrawableChild(widget);
                     i++;
                 }
             }
@@ -176,10 +185,20 @@ public class QuicksearchUI extends SpruceScreen {
             if(currentMode == InputMode.SEARCH) {
 
                 ScissorManager.push((int) (topCorner.x - search_width + 1), (int) (bottomCorner.y + search_height + 1), (int) search_width, (int) (this.height / 1.25f), scaleFactor);
-
-                resultArrayList.forEach(searchItemWidget -> searchItemWidget.render(matrices, mouseX, mouseY, delta));
-
+                for (int i = 0; i < this.resultArrayList.size(); i++) {
+                    SearchEntryWidget widget = resultArrayList.get(i);
+                    widget.acceptBounds((int) (topCorner.x - search_width + 1), (int) (bottomCorner.y + search_height + 1), (int) search_width, (int) (this.height / 1.25f));
+                    widget.setY((int) ((topCorner.y) + (i*search_height) + scrollOffset) + i + 1);
+                    widget.setX((int) (topCorner.x-search_width)+1);
+                    widget.render(matrices, mouseX, mouseY, delta);
+                }
                 ScissorManager.pop();
+                for (var element : this.children()) {
+                    if (element instanceof Drawable drawable && !(element instanceof SearchEntryWidget))
+                        drawable.render(matrices, mouseX, mouseY, delta);
+                }
+                Tooltip.renderAll(this, matrices);
+                return;
             }
         }
 

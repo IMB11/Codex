@@ -17,6 +17,9 @@
   "entrypoints": {
     "client": [
       "mine.block.quicksearch.client.QuicksearchClient"
+    ],
+    "emi": [
+      "mine.block.quicksearch.compat.QuicksearchEMI"
     ]
   },
   "mixins": [

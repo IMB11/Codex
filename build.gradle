@@ -9,6 +9,7 @@ group = project.maven_group
 repositories {
     maven { url 'https://maven.gegy.dev' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.terraformersmc.com/' }
 }
 
 dependencies {
@@ -23,6 +24,8 @@ dependencies {
     include implementation('com.ezylang:EvalEx:3.0.1')
     include modImplementation("dev.lambdaurora:spruceui:${project.spruceui_version}")
     include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
+
+    modImplementation "dev.emi:emi:${emi_version}"
 }
 
 processResources {

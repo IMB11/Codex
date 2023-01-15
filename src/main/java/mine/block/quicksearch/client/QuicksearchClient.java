@@ -11,14 +11,21 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.Item;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static mine.block.quicksearch.math.FunctionRegistry.registerFunction;
 
 @Environment(EnvType.CLIENT)
 public class QuicksearchClient implements ClientModInitializer {
     private static final KeyBinding OPEN_QUICKSEARCH_KEY = new KeyBinding("open_quicksearch", GLFW.GLFW_KEY_N, "quicksearch");
+
+    public static Consumer<Item> OPEN_RECIPE_SUPPLIER;
 
     @Override
     public void onInitializeClient() {
