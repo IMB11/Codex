@@ -14,6 +14,6 @@ import java.math.RoundingMode;
 public class TickToSecFunction extends AbstractFunction {
     @Override
     public EvaluationValue evaluate(Expression expression, Token functionToken, EvaluationValue... parameterValues) throws EvaluationException {
-        return new EvaluationValue(parameterValues[0].getNumberValue().divide(BigDecimal.valueOf(20)));
+        return new EvaluationValue(parameterValues[0].getNumberValue().floatValue() / 20f);
     }
 }

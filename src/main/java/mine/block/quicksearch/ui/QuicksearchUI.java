@@ -3,28 +3,37 @@ package mine.block.quicksearch.ui;
 import com.ezylang.evalex.Expression;
 import com.ezylang.evalex.config.ExpressionConfiguration;
 import com.ezylang.evalex.functions.FunctionIfc;
+import com.mojang.blaze3d.systems.RenderSystem;
+import dev.lambdaurora.spruceui.Tooltip;
+import dev.lambdaurora.spruceui.screen.SpruceScreen;
 import dev.lambdaurora.spruceui.util.ScissorManager;
-import me.x150.renderer.renderer.ClipStack;
-import me.x150.renderer.renderer.Rectangle;
+import me.x150.renderer.renderer.Renderer2d;
+import me.x150.renderer.renderer.color.Color;
+import me.x150.renderer.renderer.util.BlurMaskFramebuffer;
 import mine.block.quicksearch.math.FunctionRegistry;
 import mine.block.quicksearch.search.SearchManager;
 import mine.block.quicksearch.search.SearchResult;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Vector2i;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
-public class QuicksearchUI extends Screen {
+public class QuicksearchUI extends SpruceScreen {
     public TextFieldWidget inputBox;
+    public Vector2i topCorner;
+    public Vector2i bottomCorner;
 
     public QuicksearchUI() {
         super(Text.translatable("quicksearch.screen.title"));
@@ -36,11 +45,11 @@ public class QuicksearchUI extends Screen {
     }
 
     public Vector2i calculateTopLeftCorner(float width, float height) {
-        return new Vector2i((int) ((this.width / 2) + (width / 2)), (int) ((this.height / 2) + (height / 2)));
+        return new Vector2i((int) ((this.width / 2) + (width / 2)), (int) ((this.height / 8) + (height / 2)));
     }
 
     public Vector2i calculateBottomRightCorner(float width, float height) {
-        return new Vector2i((int) ((this.width / 2) - (width / 2)), (int) ((this.height / 2) - (height / 2)));
+        return new Vector2i((int) ((this.width / 2) - (width / 2)), (int) ((this.height / 8) - (height / 2)));
     }
 
     public final float search_width = 213.5f;
@@ -50,15 +59,15 @@ public class QuicksearchUI extends Screen {
     protected void init() {
         super.init();
 
-        Vector2i topCorner = calculateTopLeftCorner(search_width, search_height);
-        Vector2i bottomCorner = calculateBottomRightCorner(search_width, search_height);
+        topCorner = calculateTopLeftCorner(search_width, search_height);
+        bottomCorner = calculateBottomRightCorner(search_width, search_height);
 
         inputBox = new TextFieldWidget(this.textRenderer, (int) (topCorner.x - search_width + 5), (int) (topCorner.y - (search_height / 2f) - (this.textRenderer.fontHeight / 2f)), (int) (search_width - 25), (int) search_height, Text.of(""));
         inputBox.setDrawsBackground(false);
-        inputBox.setEditable(true);
         inputBox.setPlaceholder(Text.literal("Type anything...").formatted(Formatting.DARK_GRAY, Formatting.ITALIC));
         inputBox.setVisible(true);
         inputBox.setTextFieldFocused(true);
+        inputBox.setFocusUnlocked(true);
         inputBox.setChangedListener(this::inputChanged);
 
 //        this.addDrawableChild(resultList);
@@ -67,8 +76,7 @@ public class QuicksearchUI extends Screen {
 
     public InputMode currentMode = InputMode.NONE;
     public String output = null;
-    public ArrayList<SearchResult> resultArrayList = new ArrayList<>();
-    public ClipStack clipStack = new ClipStack();
+    public ArrayList<SearchItemWidget> resultArrayList = new ArrayList<>();
 
     private void inputChanged(String s) {
         output = null;
@@ -78,13 +86,15 @@ public class QuicksearchUI extends Screen {
 
             try {
                 var txt_expression = s.substring(1);
+
                 ExpressionConfiguration configuration = ExpressionConfiguration.defaultConfiguration()
-                        .withAdditionalFunctions((Map.Entry<String, FunctionIfc>[]) FunctionRegistry.CUSTOM_FUNCTIONS.entrySet().toArray());
+                        .withAdditionalFunctions(FunctionRegistry.CUSTOM_FUNCTIONS.entrySet().toArray(new Map.Entry[FunctionRegistry.CUSTOM_FUNCTIONS.size()]));
                 Expression expression = new Expression(txt_expression, configuration).withValues(Map.of(
                         "STACK", 64
                 ));
 
                 var eval= expression.evaluate();
+
                 switch (eval.getDataType()) {
                     case STRING -> output = eval.getStringValue();
                     case NUMBER -> output = eval.getNumberValue().toPlainString();
@@ -106,9 +116,12 @@ public class QuicksearchUI extends Screen {
             currentMode = InputMode.SEARCH;
 
             final var keys = SearchManager.SEARCH_MAP.keySet();
+            int i = 1;
             for (String key : keys) {
                 if(key.contains(s)) {
-                    resultArrayList.add(SearchManager.SEARCH_MAP.get(key));
+                    // DrawableHelper.fill(matrices, topCorner.x, (int) ((topCorner.y+1+(i*(search_height+1)))+scrollOffset), bottomCorner.x, (int) ((bottomCorner.y+1+(i*(search_height+1)))+scrollOffset), 0xFF191414);
+                    resultArrayList.add(new SearchItemWidget(this, SearchManager.SEARCH_MAP.get(key), i));
+                    i++;
                 }
             }
         }
@@ -119,10 +132,13 @@ public class QuicksearchUI extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         float offsetMax = -(resultArrayList.size() * search_width);
+
+        if(resultArrayList.size() < 4) return super.mouseScrolled(mouseX, mouseY, amount);
+
         if(scrollOffset < offsetMax) {
             scrollOffset = offsetMax;
         } else {
-           scrollOffset -= (float) (-amount * 2);
+           scrollOffset -= (float) (-amount * 5);
         }
 
         if(scrollOffset > 0) {
@@ -133,10 +149,21 @@ public class QuicksearchUI extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        this.mouseScrolled(mouseX, mouseY, deltaY / 5);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
 
-        Vector2i topCorner = calculateTopLeftCorner(search_width, search_height);
-        Vector2i bottomCorner = calculateBottomRightCorner(search_width, search_height);
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        ScissorManager.pushScaleFactor(this.scaleFactor);
+
+        BlurMaskFramebuffer.useAndDraw(() -> {
+            Renderer2d.renderQuad(matrices, Color.WHITE, 0, 0, this.width, this.height);
+        }, 16);
+
+        topCorner = calculateTopLeftCorner(search_width, search_height);
+        bottomCorner = calculateBottomRightCorner(search_width, search_height);
 
         DrawableHelper.fill(matrices, topCorner.x, topCorner.y, bottomCorner.x, bottomCorner.y, 0xFF191414);
         DrawableHelper.fill(matrices, (int) (topCorner.x - search_width) - 5, topCorner.y, (int) (topCorner.x - search_width) + 1, bottomCorner.y, this.currentMode.getColor());
@@ -148,19 +175,17 @@ public class QuicksearchUI extends Screen {
         } else {
             if(currentMode == InputMode.SEARCH) {
 
-                clipStack.use(matrices, new Rectangle(topCorner.x, bottomCorner.y + 1, search_width, search_height*5), () -> {
-                    DrawableHelper.fill(matrices, 0, 0, this.width, this.height, 0xFFFFFFFF);
-                });
+                ScissorManager.push((int) (topCorner.x - search_width + 1), (int) (bottomCorner.y + search_height + 1), (int) search_width, (int) (this.height / 1.25f), scaleFactor);
 
-                for (int i = 1; i < resultArrayList.size() + 1; i++) {
-                    DrawableHelper.fill(matrices, topCorner.x, (int) ((topCorner.y+1+(i*(search_height+1)))+scrollOffset), bottomCorner.x, (int) ((bottomCorner.y+1+(i*(search_height+1)))+scrollOffset), 0xFF191414);
-                    SearchResult result = resultArrayList.get(i-1);
-                    this.textRenderer.drawWithShadow(matrices, result.getName(), topCorner.x - search_width + 5, ((topCorner.y+1+(i*(search_height+1))) - ((search_height+1) - (this.textRenderer.fontHeight)))+scrollOffset, Formatting.GRAY.getColorValue());
-                }
+                resultArrayList.forEach(searchItemWidget -> searchItemWidget.render(matrices, mouseX, mouseY, delta));
+
+                ScissorManager.pop();
             }
         }
 
-        super.render(matrices, mouseX, mouseY, delta);
+        this.renderWidgets(matrices, mouseX, mouseY, delta);
+        Tooltip.renderAll(this, matrices);
+        ScissorManager.popScaleFactor();
     }
 
     public enum InputMode {

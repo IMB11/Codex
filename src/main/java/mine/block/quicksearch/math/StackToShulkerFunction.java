@@ -13,6 +13,6 @@ import java.math.BigDecimal;
 public class StackToShulkerFunction extends AbstractFunction {
     @Override
     public EvaluationValue evaluate(Expression expression, Token functionToken, EvaluationValue... parameterValues) throws EvaluationException {
-        return new EvaluationValue(parameterValues[0].getNumberValue().divide(BigDecimal.valueOf(30)));
+        return new EvaluationValue(parameterValues[0].getNumberValue().floatValue() / 30f);
     }
 }

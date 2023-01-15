@@ -14,6 +14,6 @@ public class ToStackFunction extends AbstractFunction {
     @Override
     public EvaluationValue evaluate(Expression expression, Token functionToken, EvaluationValue... parameterValues) throws EvaluationException {
         EvaluationValue value = parameterValues[0];
-        return new EvaluationValue(value.getNumberValue().divide(BigDecimal.valueOf(64)));
+        return new EvaluationValue(value.getNumberValue().floatValue() / 64f);
     }
 }
