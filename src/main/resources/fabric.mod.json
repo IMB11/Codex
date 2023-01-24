@@ -20,6 +20,9 @@
     ],
     "emi": [
       "mine.block.quicksearch.compat.QuicksearchEMI"
+    ],
+    "fabric-datagen": [
+      "mine.block.quicksearch.datagen.QuicksearchDatagen"
     ]
   },
   "mixins": [
