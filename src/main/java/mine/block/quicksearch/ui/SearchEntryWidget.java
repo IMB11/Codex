@@ -1,6 +1,7 @@
 package mine.block.quicksearch.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.lambdaurora.spruceui.Position;
 import me.x150.renderer.renderer.Rectangle;
 import mine.block.quicksearch.client.QuicksearchClient;
 import mine.block.quicksearch.search.SearchResult;
@@ -15,9 +16,11 @@ public class SearchEntryWidget extends EmptyWidget {
 
     private final SearchResult result;
     private Rectangle clickableBounds;
+    private QuicksearchUI parent;
 
     public SearchEntryWidget(QuicksearchUI quicksearchUI, SearchResult searchResult, int width, int height) {
         super(width, height);
+        this.parent = quicksearchUI;
         this.result = searchResult;
     }
 
@@ -60,12 +63,10 @@ public class SearchEntryWidget extends EmptyWidget {
     }
 
 
-
     @Override
-    public void onClick(double mouseX, double mouseY) {
-        if(QuicksearchClient.OPEN_RECIPE_SUPPLIER != null) {
-            QuicksearchClient.OPEN_RECIPE_SUPPLIER.accept(this.result.getEntry());
-        }
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        MinecraftClient.getInstance().setScreen(new CodexScreen(this.result));
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     public void acceptBounds(int x, int y, int width, int height) {
