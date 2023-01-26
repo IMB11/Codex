@@ -3,7 +3,6 @@ package mine.block.quicksearch.datagen;
 import io.umehara.ogmapper.OgMapper;
 import io.umehara.ogmapper.domain.OgTags;
 import io.umehara.ogmapper.jsoup.JsoupOgMapperFactory;
-import io.umehara.ogmapper.service.OgMapperFactory;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.item.Item;
@@ -18,14 +17,10 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MinecraftWikiProvider extends FabricLanguageProvider {
     private TranslationBuilder translationBuilder;
-    private HashMap<RegistryKey<Item>, Exception> failed = new HashMap<>();
+    private final HashMap<RegistryKey<Item>, Exception> failed = new HashMap<>();
 
     protected MinecraftWikiProvider(FabricDataOutput dataOutput) {
         super(dataOutput);
