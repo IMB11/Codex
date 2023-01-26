@@ -16,7 +16,11 @@ More information on the Open Graph Protocol [can be found here.](https://ogp.me/
 
 I am not breaking it because the wiki is not being distributed with the mod. The user must provide a URL or select from preset URLs to download a pre-processed JSON file of item descriptions, and other configuration.
 
-No wiki content is being distributed AT ALL.
+No wiki content is being distributed AT ALL in the jar file - meaning the license currently used is valid.
+
+***Why ARR?***
+
+It's not done ;p
 
 ***Is this an REI replacement?***
 
