@@ -1,12 +1,10 @@
 package mine.block.quicksearch.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.lambdaurora.spruceui.Position;
 import me.x150.renderer.renderer.Rectangle;
 import mine.block.quicksearch.client.QuicksearchClient;
 import mine.block.quicksearch.search.SearchResult;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.EmptyWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,7 +14,7 @@ public class SearchEntryWidget extends EmptyWidget {
 
     private final SearchResult result;
     private Rectangle clickableBounds;
-    private QuicksearchUI parent;
+    private final QuicksearchUI parent;
 
     public SearchEntryWidget(QuicksearchUI quicksearchUI, SearchResult searchResult, int width, int height) {
         super(width, height);
@@ -26,13 +24,13 @@ public class SearchEntryWidget extends EmptyWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(clickableBounds != null) {
-            if(!clickableBounds.contains(this.getX(), this.getY())) {
+        if (clickableBounds != null) {
+            if (!clickableBounds.contains(this.getX(), this.getY())) {
                 return false;
             }
         }
 
-        if(QuicksearchClient.OPEN_RECIPE_SUPPLIER == null) {
+        if (QuicksearchClient.OPEN_RECIPE_SUPPLIER == null) {
             return false;
         }
 
@@ -43,7 +41,7 @@ public class SearchEntryWidget extends EmptyWidget {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         int color = this.isHovered() ? 0xFF191414 : 0x7F191414;
 
-        fill(matrices, getX(), getY() + getHeight(), getX()+getWidth(), getY(), color);
+        fill(matrices, getX(), getY() + getHeight(), getX() + getWidth(), getY(), color);
 
         RenderSystem.enableDepthTest();
         MinecraftClient client = MinecraftClient.getInstance();
@@ -51,14 +49,14 @@ public class SearchEntryWidget extends EmptyWidget {
         renderer.zOffset = 100f;
         renderer.renderInGui(result.getEntry().getDefaultStack(),
                 getX() + 10,
-                (int) (((getY() + getHeight()) - 10 - (client.textRenderer.fontHeight+4.5f))));
+                (int) (((getY() + getHeight()) - 10 - (client.textRenderer.fontHeight + 4.5f))));
         renderer.zOffset = 0f;
         RenderSystem.disableDepthTest();
 
         client.textRenderer.drawWithShadow(matrices,
                 result.getName(),
                 getX() + 32,
-                (int) (getY() + getHeight() - ((client.textRenderer.fontHeight+4.5f) * 1.5f)),
+                (int) (getY() + getHeight() - ((client.textRenderer.fontHeight + 4.5f) * 1.5f)),
                 Formatting.GRAY.getColorValue());
     }
 
@@ -70,6 +68,6 @@ public class SearchEntryWidget extends EmptyWidget {
     }
 
     public void acceptBounds(int x, int y, int width, int height) {
-        this.clickableBounds = new Rectangle(x, y, x+width, y+height);
+        this.clickableBounds = new Rectangle(x, y, x + width, y + height);
     }
 }
