@@ -3,7 +3,7 @@
     "title": "Minecraft Wiki",
     "license": "CC BY-NC-SA 3.0",
     "descriptions": "/descriptions/mc-wiki.json",
-    "icon": "/icons/mc-wiki.png",
+    "icon": "/icons/mcwiki.png",
     "requiredIf": [
       "default"
     ]
