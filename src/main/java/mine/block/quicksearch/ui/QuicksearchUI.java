@@ -26,6 +26,7 @@ import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Vector2i;
 
+import java.awt.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;

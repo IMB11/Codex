@@ -11,6 +11,7 @@ repositories {
     maven { url 'https://maven.gegy.dev' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.terraformersmc.com/' }
+    maven { url 'https://maven.wispforest.io' }
     maven { url "https://cursemaven.com"
         content {
             includeGroup "curse.maven"
@@ -46,7 +47,9 @@ dependencies {
     include implementation('com.ezylang:EvalEx:3.0.1')
     include implementation('io.umehara:ogmapper:1.0.0')
     include modImplementation("dev.lambdaurora:spruceui:${project.spruceui_version}")
-    include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
+    include modImplementation("com.github.0x3C50:Renderer:2f808e1a0c")
+    include modImplementation("io.wispforest:owo-lib:${project.owo_version}")
+    annotationProcessor("io.wispforest:owo-lib:${project.owo_version}")
 
 //    modImplementation(include("gg.essential:elementa-1.18-fabric:+"))
 
