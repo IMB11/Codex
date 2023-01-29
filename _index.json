@@ -14,5 +14,14 @@
     "descriptions": "/descriptions/mc-wiki-es.json",
     "icon": "/icons/mc-wiki-es.png",
     "requiredIf": []
+  },
+  {
+    "title": "Create Wiki",
+    "license": "CC BY-SA 3.0",
+    "descriptions": "/descriptions/create-wiki.json",
+    "icon": "/icons/create-wiki.png",
+    "requiredIf": [
+      "create"
+    ]
   }
 ]
