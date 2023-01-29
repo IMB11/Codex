@@ -3,9 +3,16 @@
     "title": "Minecraft Wiki",
     "license": "CC BY-NC-SA 3.0",
     "descriptions": "/descriptions/mc-wiki.json",
-    "icon": "/icons/mcwiki.png",
+    "icon": "/icons/mc-wiki.png",
     "requiredIf": [
       "default"
     ]
+  },
+  {
+    "title": "Minecraft Wiki ES\n",
+    "license": "CC BY-NC-SA 3.0",
+    "descriptions": "/descriptions/mc-wiki-es.json",
+    "icon": "/icons/mc-wiki-es.png",
+    "requiredIf": []
   }
 ]
