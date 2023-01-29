@@ -49,13 +49,11 @@ public class QuicksearchClient implements ClientModInitializer {
             }
         });
 
-        RRPCallback.BEFORE_USER.register(resources -> {
+        RRPCallback.AFTER_VANILLA.register(resources -> {
             var translations = CodexUtils.getCodexLanguageFiles();
             translations.forEach((lang, entries) -> {
                 JLang langFile = new JLang();
-                entries.asMap().forEach((key, val) -> {
-                    langFile.entry(key, val.getAsString());
-                });
+                entries.asMap().forEach((key, val) -> langFile.entry(key, val.getAsString()));
                 RESOURCE_PACK.addLang(new Identifier("codex", lang), langFile);
             });
             resources.add(RESOURCE_PACK);

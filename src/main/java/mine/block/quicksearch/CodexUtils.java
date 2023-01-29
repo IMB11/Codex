@@ -39,7 +39,7 @@ public class CodexUtils {
             try {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_16));
                 JsonObject obj = GSON.fromJson(rd, JsonObject.class);
-                CACHED_LANGUAGE_CODES.put(file.getName().replace("merged.json", ""), obj);
+                CACHED_LANGUAGE_CODES.put(file.getName().replace(".merged.json", ""), obj);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
