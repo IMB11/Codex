@@ -6,13 +6,26 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class SearchManager {
-    public static HashMap<String, SearchResult> SEARCH_MAP = new HashMap<>();
+    private static HashMap<String, SearchResult> SEARCH_MAP = new HashMap<>();
+    public static SearchResult[] search(String query) {
+        if(query.isBlank()) return new SearchResult[0];
+        TreeSet<SearchResult> results = new TreeSet<>(Comparator.comparing(o -> o.getName().getString()));
+        SEARCH_MAP.entrySet().forEach((pair) -> {
+            if(pair.getKey().toLowerCase().contains(query.toLowerCase().trim())) {
+                results.add(pair.getValue());
+            }
+        });
+        return results.toArray(new SearchResult[0]);
+    }
 
-    public static void initialize() {
+    public static void refresh() {
+        SEARCH_MAP.clear();
         for (Map.Entry<RegistryKey<Item>, Item> registryKeyItemEntry : Registries.ITEM.getEntrySet()) {
             var key = registryKeyItemEntry.getKey();
             var item = registryKeyItemEntry.getValue();

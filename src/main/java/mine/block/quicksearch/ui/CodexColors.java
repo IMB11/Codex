@@ -19,11 +19,7 @@ public class CodexColors {
     public static final int DARK_GRAY = 0xFF5A5A5A;
 
     public static int withAlpha(int color, int alpha) {
-        color &= ~(0x0FL << 4);
-        color |= (long) alpha << 4;
-        color &= ~(0x0FL << 8);
-        color |= (long) alpha << 8;
-        return color;
+        return (color & 0x00ffffff) | (alpha << 24);
     }
 
     public static int getAlpha(int color) {

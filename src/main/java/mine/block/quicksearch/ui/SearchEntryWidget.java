@@ -39,7 +39,9 @@ public class SearchEntryWidget extends EmptyWidget {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        int color = this.isHovered() ? 0xFF191414 : 0x7F191414;
+        this.hovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+
+        int color = this.isHovered() ? CodexColors.withAlpha(CodexColors.CODEX_BG, CodexColors.ALPHA_75) : CodexColors.withAlpha(CodexColors.CODEX_BG, CodexColors.ALPHA_50);
 
         fill(matrices, getX(), getY() + getHeight(), getX() + getWidth(), getY(), color);
 

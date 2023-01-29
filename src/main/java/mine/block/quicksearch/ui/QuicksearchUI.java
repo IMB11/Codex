@@ -8,8 +8,10 @@ import dev.lambdaurora.spruceui.util.ScissorManager;
 import me.x150.renderer.renderer.Renderer2d;
 import me.x150.renderer.renderer.color.Color;
 import me.x150.renderer.renderer.util.BlurMaskFramebuffer;
+import mine.block.quicksearch.CodexUtils;
 import mine.block.quicksearch.math.FunctionRegistry;
 import mine.block.quicksearch.search.SearchManager;
+import mine.block.quicksearch.search.SearchResult;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -32,7 +34,7 @@ public class QuicksearchUI extends SpruceScreen {
     public InputMode currentMode = InputMode.NONE;
     public String output = null;
     public ArrayList<SearchEntryWidget> resultArrayList = new ArrayList<>();
-    public float scrollOffset = 0;
+    public float scrollOffset = 0, targetScrollOffset = 0;
 
     public QuicksearchUI() {
         super(Text.translatable("quicksearch.screen.title"));
@@ -66,17 +68,17 @@ public class QuicksearchUI extends SpruceScreen {
         this.addDrawableChild(inputBox);
     }
 
-    private void inputChanged(String s) {
+    private void inputChanged(String query) {
         output = null;
         if (!resultArrayList.isEmpty()) {
             resultArrayList.forEach(this::remove);
             resultArrayList.clear();
         }
-        if (s.startsWith("=")) {
+        if (query.startsWith("=")) {
             currentMode = InputMode.MATH;
 
             try {
-                var txt_expression = s.substring(1);
+                var txt_expression = query.substring(1);
 
                 ExpressionConfiguration configuration = ExpressionConfiguration.defaultConfiguration()
                         .withAdditionalFunctions(FunctionRegistry.CUSTOM_FUNCTIONS.entrySet().toArray(new Map.Entry[FunctionRegistry.CUSTOM_FUNCTIONS.size()]));
@@ -101,24 +103,21 @@ public class QuicksearchUI extends SpruceScreen {
             } catch (Exception ignored) {
                 output = "?";
             }
-        } else if (s.isBlank()) {
+        } else if (query.isBlank()) {
             currentMode = InputMode.NONE;
         } else {
             currentMode = InputMode.SEARCH;
 
-            final var keys = SearchManager.SEARCH_MAP.keySet();
+            final var results = SearchManager.search(query);
             int i = 1;
-            for (String key : keys) {
-                if (key.contains(s)) {
-                    // DrawableHelper.fill(matrices, topCorner.x, (int) ((topCorner.y+1+(i*(search_height+1)))+scrollOffset), bottomCorner.x, (int) ((bottomCorner.y+1+(i*(search_height+1)))+scrollOffset), 0xFF191414);
-                    var widget = new SearchEntryWidget(this, SearchManager.SEARCH_MAP.get(key), (int) search_width, (int) search_height);
-                    resultArrayList.add(widget);
-                    widget.visible = true;
-                    widget.setY((int) (search_height * i));
-                    widget.setX(topCorner.x);
-                    this.addDrawableChild(widget);
-                    i++;
-                }
+            for (SearchResult result : results) {
+                var widget = new SearchEntryWidget(this, result, (int) search_width, (int) search_height);
+                resultArrayList.add(widget);
+                widget.visible = true;
+                widget.setY((int) (search_height * i));
+                widget.setX(topCorner.x);
+                this.addDrawableChild(widget);
+                i++;
             }
         }
     }
@@ -129,14 +128,14 @@ public class QuicksearchUI extends SpruceScreen {
 
         if (resultArrayList.size() < 4) return super.mouseScrolled(mouseX, mouseY, amount);
 
-        if (scrollOffset < offsetMax) {
-            scrollOffset = offsetMax;
+        if (targetScrollOffset < offsetMax) {
+            targetScrollOffset = offsetMax;
         } else {
-            scrollOffset -= (float) (-amount * 5);
+            targetScrollOffset -= (float) (-amount * 12.5f);
         }
 
-        if (scrollOffset > 0) {
-            scrollOffset = 0;
+        if (targetScrollOffset > 0) {
+            targetScrollOffset = 0;
         }
 
         return super.mouseScrolled(mouseX, mouseY, amount);
@@ -144,13 +143,15 @@ public class QuicksearchUI extends SpruceScreen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        this.mouseScrolled(mouseX, mouseY, deltaY / 5);
+        this.mouseScrolled(mouseX, mouseY, deltaY / 1.5f);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         ScissorManager.pushScaleFactor(this.scaleFactor);
+
+        this.scrollOffset = CodexUtils.lerp(delta, this.scrollOffset, this.targetScrollOffset);
 
         BlurMaskFramebuffer.useAndDraw(() -> {
             Renderer2d.renderQuad(matrices, Color.WHITE, 0, 0, this.width, this.height);
@@ -159,7 +160,7 @@ public class QuicksearchUI extends SpruceScreen {
         topCorner = calculateTopLeftCorner(search_width, search_height);
         bottomCorner = calculateBottomRightCorner(search_width, search_height);
 
-        DrawableHelper.fill(matrices, topCorner.x, topCorner.y, bottomCorner.x, bottomCorner.y, 0xFF191414);
+        DrawableHelper.fill(matrices, topCorner.x, topCorner.y, bottomCorner.x, bottomCorner.y, CodexColors.CODEX_BG);
         DrawableHelper.fill(matrices, (int) (topCorner.x - search_width) - 5, topCorner.y, (int) (topCorner.x - search_width) + 1, bottomCorner.y, this.currentMode.getColor());
         if (output != null) {
             if (currentMode == InputMode.MATH) {

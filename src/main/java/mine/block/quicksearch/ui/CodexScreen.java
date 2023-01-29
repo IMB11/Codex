@@ -8,6 +8,7 @@ import me.x150.renderer.renderer.color.Color;
 import me.x150.renderer.renderer.util.BlurMaskFramebuffer;
 import mine.block.quicksearch.search.SearchResult;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -35,7 +36,7 @@ public class CodexScreen extends SpruceScreen {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+//        super.render(matrices, mouseX, mouseY, delta);
 
         BlurMaskFramebuffer.useAndDraw(() -> {
             Renderer2d.renderQuad(matrices, Color.WHITE, 0, 0, this.width, this.height);
@@ -46,33 +47,42 @@ public class CodexScreen extends SpruceScreen {
 
         drawTextWithShadow(matrices, this.textRenderer, this.result.getName(), getRelativeX(12 + 32), getRelativeY(19 - (this.textRenderer.fontHeight / 2)), CodexColors.WHITE);
 
-        RenderSystem.enableDepthTest();
-        MinecraftClient client = MinecraftClient.getInstance();
-        ItemRenderer renderer = client.getItemRenderer();
-        MinecraftClient.getInstance().getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).setFilter(false, false);
-        RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        MatrixStack matrixStack = RenderSystem.getModelViewStack();
-        var model = renderer.getModel(this.result.getEntry().getDefaultStack(), null, null, 0);
-        renderer.zOffset = 100f;
-        matrixStack.push();
-        matrixStack.translate((float) getRelativeX(12), (float) getRelativeY(12), 100.0F + renderer.zOffset);
-        matrixStack.translate(8.0F, 8.0F, 0.0F);
-        matrixStack.scale(2F, -2.0F, 2F);
-        matrixStack.scale(16.0F, 16.0F, 16.0F);
-        RenderSystem.applyModelViewMatrix();
-        MatrixStack matrixStack2 = new MatrixStack();
-        VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        // Item/Block render.
+        {
+            RenderSystem.enableDepthTest();
+            MinecraftClient client = MinecraftClient.getInstance();
+            ItemRenderer renderer = client.getItemRenderer();
+            var model = renderer.getModel(this.result.getEntry().getDefaultStack(), this.client.world, null, 0);
+            client.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).setFilter(false, false);
+            RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            MatrixStack matrixStack = RenderSystem.getModelViewStack();
+            matrixStack.push();
+            matrixStack.translate((float) getRelativeX(5 + 8), (float) getRelativeY(5 + 8), 100.0F + renderer.zOffset);
+            matrixStack.translate(8.0F, 8.0F, 0.0F);
+            matrixStack.scale(2.0F, -2.0F, 2.0F);
+            matrixStack.scale(16.0F, 16.0F, 16.0F);
+            RenderSystem.applyModelViewMatrix();
+            MatrixStack matrixStack2 = new MatrixStack();
+            VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+            boolean bl = !model.isSideLit();
+            if (bl) {
+                DiffuseLighting.disableGuiDepthLighting();
+            }
 
-        renderer.renderItem(this.result.getEntry().getDefaultStack(), ModelTransformation.Mode.GUI, false, matrixStack2, immediate, 0xF000FF, OverlayTexture.DEFAULT_UV, model);
-        immediate.draw();
+            renderer.renderItem(this.result.getEntry().getDefaultStack(), ModelTransformation.Mode.GUI, false, matrixStack2, immediate, 15728880, OverlayTexture.DEFAULT_UV, model);
+            immediate.draw();
+            RenderSystem.enableDepthTest();
+            if (bl) {
+                DiffuseLighting.enableGuiDepthLighting();
+            }
 
-        matrixStack.pop();
-        RenderSystem.applyModelViewMatrix();
-        renderer.zOffset = 0f;
+            matrixStack.pop();
+            RenderSystem.applyModelViewMatrix();
+        }
 
-        this.textRenderer.drawTrimmed(Text.translatable(this.result.getKey().getValue().toTranslationKey("description")), getRelativeX(5), getRelativeY(32 + 10), (int) ((100 - 5f) / 100f * (this.width - 10)), CodexColors.DARK_GRAY);
+        this.textRenderer.drawTrimmed(Text.translatable(this.result.getKey().getValue().toTranslationKey("description")), getRelativeX(5), getRelativeY(32 + 10), (int) (85f / 100f * this.width), CodexColors.DARK_GRAY);
     }
 }
