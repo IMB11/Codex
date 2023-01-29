@@ -12,14 +12,18 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.terraformersmc.com/' }
     maven { url 'https://maven.wispforest.io' }
-    maven { url "https://cursemaven.com"
+    maven {url "https://storage.googleapis.com/devan-maven/" }
+    maven {
+        url "https://cursemaven.com"
         content {
             includeGroup "curse.maven"
         }
     }
+
 }
 
 loom {
+    accessWidenerPath = file("src/main/resources/codex.accesswidener")
     runs {
         datagenClient {
             client()
@@ -50,7 +54,7 @@ dependencies {
     include modImplementation("com.github.0x3C50:Renderer:2f808e1a0c")
     include modImplementation("io.wispforest:owo-lib:${project.owo_version}")
     annotationProcessor("io.wispforest:owo-lib:${project.owo_version}")
-
+    include modImplementation("net.devtech:arrp:0.6.7")
 //    modImplementation(include("gg.essential:elementa-1.18-fabric:+"))
 
     modCompileOnly "dev.emi:emi:${emi_version}"

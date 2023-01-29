@@ -1,5 +1,7 @@
 package mine.block.quicksearch.ui;
 
+import net.minecraft.util.math.MathHelper;
+
 public class CodexColors {
     public static final int CODEX_BG = 0xFF1D1D1D;
     public static final int CODEX_ELEVATED = 0xFF2D3134;
@@ -22,5 +24,38 @@ public class CodexColors {
         color &= ~(0x0FL << 8);
         color |= (long) alpha << 8;
         return color;
+    }
+
+    public static int getAlpha(int color) {
+        return color >> 24 & 0xFF;
+    }
+
+    public static int getRed(int color) {
+        return color >> 16 & 0xFF;
+    }
+
+    public static int getGreen(int color) {
+        return color >> 8 & 0xFF;
+    }
+
+    public static int getBlue(int color) {
+        return color & 0xFF;
+    }
+
+    public static int interpolateTwoColors(float step, int color1, int color2) {
+        step = MathHelper.clamp(step, 0.0f, 1.0f);
+        int deltaAlpha = getAlpha(color2) - getAlpha(color1);
+        int deltaRed = getRed(color2) - getRed(color1);
+        int deltaGreen = getGreen(color2) - getGreen(color1);
+        int deltaBlue = getBlue(color2) - getBlue(color1);
+        int resultAlpha = (int) (getAlpha(color1) + (deltaAlpha * step));
+        int resultRed = (int) (getRed(color1) + (deltaRed * step));
+        int resultGreen = (int) (getGreen(color1) + (deltaGreen * step));
+        int resultBlue = (int) (getBlue(color1) + (deltaBlue * step));
+        resultAlpha = Math.max(Math.min(resultAlpha, 255), 0);
+        resultRed = Math.max(Math.min(resultRed, 255), 0);
+        resultGreen = Math.max(Math.min(resultGreen, 255), 0);
+        resultBlue = Math.max(Math.min(resultBlue, 255), 0);
+        return resultAlpha << 24 | resultRed << 16 | resultGreen << 8 | resultBlue;
     }
 }

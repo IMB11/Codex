@@ -12,6 +12,7 @@
     "repo": "https://github.com/mineblock11/quicksearch"
   },
   "license": "All-Rights-Reserved",
+  "accessWidener": "codex.accesswidener",
   "icon": "assets/quicksearch/icon.png",
   "environment": "client",
   "entrypoints": {

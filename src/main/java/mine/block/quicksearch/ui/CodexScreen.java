@@ -3,6 +3,9 @@ package mine.block.quicksearch.ui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.lambdaurora.spruceui.screen.SpruceScreen;
+import me.x150.renderer.renderer.Renderer2d;
+import me.x150.renderer.renderer.color.Color;
+import me.x150.renderer.renderer.util.BlurMaskFramebuffer;
 import mine.block.quicksearch.search.SearchResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
@@ -33,6 +36,10 @@ public class CodexScreen extends SpruceScreen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
+
+        BlurMaskFramebuffer.useAndDraw(() -> {
+            Renderer2d.renderQuad(matrices, Color.WHITE, 0, 0, this.width, this.height);
+        }, 16);
 
         fill(matrices, (int) (5f / 100f * this.width), (int) (5f / 100f * this.height), (int) ((100 - 5f) / 100f * this.width), (int) ((100 - 5f) / 100f * this.height), CodexColors.CODEX_ELEVATED);
         fill(matrices, (int) (5f / 100f * this.width), (int) (5f / 100f * this.height), (int) ((100 - 5f) / 100f * this.width), (int) (5f / 100f * this.height) + 16, CodexColors.CODEX_BG);

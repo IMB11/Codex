@@ -1,40 +1,34 @@
 package mine.block.quicksearch.ui.setup;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.lambdaurora.spruceui.Position;
 import dev.lambdaurora.spruceui.Tooltip;
 import dev.lambdaurora.spruceui.screen.SpruceScreen;
-import dev.lambdaurora.spruceui.widget.SpruceLabelWidget;
+import mine.block.quicksearch.CodexUtils;
 import mine.block.quicksearch.client.QuicksearchClient;
 import mine.block.quicksearch.ui.CodexColors;
-import mine.block.quicksearch.ui.SearchEntryWidget;
+import mine.block.quicksearch.ui.widgets.CodexButton;
 import mine.block.quicksearch.util.RandomString;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.joml.Vector2i;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class SetupScreen extends SpruceScreen {
 
     public final ArrayList<PackSelectionItem> items = new ArrayList<>();
-    public final float packListWidth = 213.5f;
-    public Gson GSON = new Gson();
+    public float packListWidth = 213.5f;
     public boolean failed = false;
     public float scrollOffset = 0;
     public Vector2i topCorner;
@@ -43,23 +37,13 @@ public class SetupScreen extends SpruceScreen {
         super(Text.empty());
     }
 
-    private JsonElement readJsonFromUrl(String url) throws IOException {
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            return GSON.fromJson(rd, JsonElement.class);
-        } finally {
-            is.close();
-        }
-    }
-
     @Override
     protected void init() {
         super.init();
 
         if (this.items.isEmpty()) {
             try {
-                JsonElement indexData = readJsonFromUrl(QuicksearchClient.CONFIG.baseUrl() + "/_index.json?" + new Random().nextInt(0, 1000));
+                JsonElement indexData = CodexUtils.readJsonFromUrl(QuicksearchClient.CONFIG.baseUrl() + "/_index.json?" + new Random().nextInt(0, 1000));
                 System.out.println(indexData.toString());
                 for (JsonElement jsonElement : indexData.getAsJsonArray()) {
                     JsonObject codexPack = jsonElement.getAsJsonObject();
@@ -72,6 +56,7 @@ public class SetupScreen extends SpruceScreen {
                     this.client.getTextureManager().registerTexture(codexPackIconTexture, codexPackIcon);
                     CodexPack pack = new CodexPack(codexPack.get("title").getAsString(),
                             codexPack.get("license").getAsString(),
+                            codexPack.get("lang").getAsString(),
                             codexPackIconTexture,
                             image.getWidth(),
                             image.getHeight(),
@@ -90,6 +75,16 @@ public class SetupScreen extends SpruceScreen {
         for (PackSelectionItem item : items) {
             this.addSelectableChild(item);
         }
+
+        this.addSelectableChild(new CodexButton(Position.of(this.width - 155, this.height - 21), 150, 16, Text.literal("Continue"), button -> {
+            ArrayList<CodexPack> packsToDownload = new ArrayList<>();
+            for (PackSelectionItem item : items) {
+                if(item.shouldUse || item.pack.forcedEnabled()) {
+                    packsToDownload.add(item.pack);
+                }
+            }
+            this.client.setScreen(new DownloadingScreen(packsToDownload));
+        }));
     }
 
     @Override
@@ -112,40 +107,43 @@ public class SetupScreen extends SpruceScreen {
     }
 
     public Vector2i calculateTopLeftCorner(float width, float height) {
-        return new Vector2i((int) width / 6, 5);
+        return new Vector2i(5, 5);
     }
 
     public Vector2i calculateBottomRightCorner(float width, float height) {
-        return new Vector2i((int) width, (this.height / 8));
+        return new Vector2i((int) (5+width), (int) (height+5));
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         fill(matrices, 0, 0, this.width, this.height, CodexColors.CODEX_BG);
 
-        topCorner = calculateTopLeftCorner(packListWidth, 30);
-        bottomCorner = calculateBottomRightCorner(packListWidth, 30);
+        packListWidth = (this.width / 2) - 10;
+        topCorner = calculateTopLeftCorner(packListWidth, (int) 30);
+        bottomCorner = calculateBottomRightCorner(packListWidth, (int) 30);
 
         for (int i = 0; i < this.items.size(); i++) {
             PackSelectionItem widget = items.get(i);
-            widget.acceptBounds((int) (topCorner.x - packListWidth + 1), bottomCorner.y + 30 + 1, (int) packListWidth, (int) (this.height / 1.25f));
             widget.setY((int) ((topCorner.y) + (i * 30) + scrollOffset) + i + 1);
-            widget.setX((topCorner.x - 30) + 1);
+            widget.setX(5);
+            widget.setWidth((int) packListWidth);
+            widget.height = 30;
             widget.render(matrices, mouseX, mouseY, delta);
         }
 
         for (var element : this.children()) {
-            if (element instanceof Drawable drawable && !(element instanceof SearchEntryWidget))
+            if (element instanceof Drawable drawable && !(element instanceof PackSelectionItem))
                 drawable.render(matrices, mouseX, mouseY, delta);
         }
 
-        this.textRenderer.draw(matrices, Text.literal("Codex Setup"), (packListWidth + 9 + this.width - this.textRenderer.getWidth(Text.literal("Codex Setup"))) / 2, 15 + 10 - this.textRenderer.fontHeight, CodexColors.WHITE);
-        this.textRenderer.drawTrimmed(matrices, Text.literal("Please select codex packs to download on the left. Packs highlighted red are required because a mod was detected that needs it - or it is part of vanilla."), );
+        this.textRenderer.draw(matrices, Text.literal("Codex Setup"), packListWidth + 10, 15 + 10 - this.textRenderer.fontHeight, CodexColors.WHITE);
+        StringVisitable descriptionText = Text.literal("Please select codex packs to download on the left. Packs highlighted red are required because a mod was detected that needs it - or it is part of vanilla.");
+        this.textRenderer.drawTrimmed(descriptionText, (int) packListWidth + 10, 15 + 20, this.width / 2, CodexColors.WHITE);
 
         Tooltip.renderAll(this, matrices);
     }
 
-    public record CodexPack(String title, String license, Identifier iconTexture, int texWidth, int texHeight,
+    public record CodexPack(String title, String license, String languageCode, Identifier iconTexture, int texWidth, int texHeight,
                             String descriptions, JsonArray requiredIf) {
         boolean forcedEnabled() {
             for (JsonElement jsonElement : requiredIf) {
