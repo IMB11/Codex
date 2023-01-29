@@ -3,6 +3,7 @@
     "title": "Minecraft Wiki",
     "license": "CC BY-NC-SA 3.0",
     "descriptions": "/descriptions/mc-wiki.json",
+    "lang": "en_us",
     "icon": "/icons/mc-wiki.png",
     "requiredIf": [
       "default"
@@ -12,6 +13,7 @@
     "title": "Minecraft Wiki ES",
     "license": "CC BY-NC-SA 3.0",
     "descriptions": "/descriptions/mc-wiki-es.json",
+    "lang": "es_es",
     "icon": "/icons/mc-wiki-es.png",
     "requiredIf": []
   },
@@ -19,6 +21,7 @@
     "title": "Create Wiki",
     "license": "CC BY-SA 3.0",
     "descriptions": "/descriptions/create-wiki.json",
+    "lang": "en_us",
     "icon": "/icons/create-wiki.png",
     "requiredIf": [
       "create"
