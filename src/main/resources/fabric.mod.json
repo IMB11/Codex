@@ -1,33 +1,30 @@
 {
   "schemaVersion": 1,
-  "id": "quicksearch",
+  "id": "codex",
   "version": "${version}",
-  "name": "QuickSearch",
+  "name": "Codex",
   "description": "Adds a spotlight search bar. Useful for quick calculations, searching for recipes and more.",
   "authors": [
     "mineblock11"
   ],
   "contact": {
     "website": "https://mineblock11.dev/",
-    "repo": "https://github.com/mineblock11/quicksearch"
+    "repo": "https://github.com/mineblock11/codex"
   },
   "license": "All-Rights-Reserved",
   "accessWidener": "codex.accesswidener",
-  "icon": "assets/quicksearch/icon.png",
+  "icon": "assets/codex/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "mine.block.quicksearch.client.QuicksearchClient"
-    ],
-    "emi": [
-      "mine.block.quicksearch.compat.QuicksearchEMI"
+      "mine.block.codex.client.CodexClient"
     ],
     "fabric-datagen": [
-      "mine.block.quicksearch.datagen.QuicksearchDatagen"
+      "mine.block.codex.datagen.CodexDatagen"
     ]
   },
   "mixins": [
-    "quicksearch.mixins.json"
+    "codex.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.12",

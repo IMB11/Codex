@@ -1,8 +1,8 @@
-# Quicksearch/Codex/Untitled Mod
+# Codex
 
 ![](https://cdn.discordapp.com/attachments/523251999899385875/1067936902952534036/java_n9E1Kgkg61.gif)
 
-QuickSearch/Codex/Untitled Mod allows you to gain information and do quick calculations in a Satisfactory-style codex screen.
+Codex allows you to gain information and do quick calculations in a Satisfactory-style codex screen.
 
 ## FAQ
 
@@ -24,7 +24,7 @@ It's not done ;p
 
 ***Is this an REI replacement?***
 
-No. Although Quicksearch/Codex/Untitled Mod shows recipes - it is not a REI/EMI/whatever replacement - these mods do not provide descriptions and tips on the usage of items/blocks - and any existing implementation sucks.
+No. Although Codex *will soon* show recipes - it is not a REI/EMI/whatever replacement - these mods do not provide descriptions and tips on the usage of items/blocks - and any existing implementation sucks.
 It can act as an alternative though, however, recipe searching is not the primary goal of this mod.
 
 ***Where can I follow development?***
