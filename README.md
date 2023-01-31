@@ -1,32 +1,74 @@
 # Codex
 
-![](https://cdn.discordapp.com/attachments/523251999899385875/1067936902952534036/java_n9E1Kgkg61.gif)
-
 Codex allows you to gain information and do quick calculations in a Satisfactory-style codex screen.
 
-## FAQ
+Currently, the mod is a proof of concept - but it is being actively developed.
 
-***Isn't scraping Fandom Wiki's against TOS?***
+I wouldn't consider it a replacement for Roughly Enough Items or Too Many Items - as those mods are more focused on the data part of the items.
 
-I am not scraping wiki pages - I request their Open Graph tags - the description tag contains the first paragraph of the page.
+Codex is more useful if you want to figure out **what** to do with an item, not **how**.
 
-More information on the Open Graph Protocol [can be found here.](https://ogp.me/)
+## Setup
 
-***The Minecraft Wiki has a Share-Alike NonCommercial license! You're breaking it!***
+Codex will guide you through it's setup screen when you launch the game for the first time with the mod:
 
-I am not breaking it because the wiki is not being distributed with the mod. The user must provide a URL or select from preset URLs to download a pre-processed JSON file of item descriptions, and other configuration.
+![](https://i.imgur.com/3Lg6or9.gif)
 
-No wiki content is being distributed AT ALL in the jar file - meaning the license currently used is valid.
+These data sources are from [the data repository](https://github.com/mineblock11/Codex/tree/data) - and respect the license of the source.
 
-***Why ARR?***
+## Showcase
 
-It's not done ;p
+### Quickmath Parser
 
-***Is this an REI replacement?***
+The quickmath parser allows you to quickly evaluate arithmetic expressions.
+This is especially useful for technical minecrafters - as it allows you to calculate various things such as shulker box capacity/redstone tick math using built in functions.
 
-No. Although Codex *will soon* show recipes - it is not a REI/EMI/whatever replacement - these mods do not provide descriptions and tips on the usage of items/blocks - and any existing implementation sucks.
-It can act as an alternative though, however, recipe searching is not the primary goal of this mod.
+![](https://i.imgur.com/Gj1csmT.gif)
 
-***Where can I follow development?***
+The quickmath parser also supports:
 
-On my discord: https://discord.gg/AvAJWbpYrq
+- [String Concatenation](https://imgur.com/qza71OB)
+- [Boolean Evaluation](https://imgur.com/QAle7gw)
+
+#### Quickmath Functions And Constants
+
+**Functions**
+
+- `stacksin(shulkers) = shulkers * 30`
+- `shulkersof(stacks) = stacks / 30`
+- `stacksof(items) = items / 64`
+- `itemsof(stacks) = stacks * 64`
+- `secsin(ticks) = ticks / 20`
+- `ticksin(secs) = secs * 20`
+
+**Constants**
+
+- `STACK = 64`
+- `SHULKER = 1920`
+- `DAY =  72 * 24000`
+- `HOUR = (72 * 24000) / 24`
+- `MIN = (72 * 24000) / 24 / 60`
+- `SEC = (72 * 24000) / 24 / 60 / 60`
+- `MS =  (72 * 24000) / 24 / 60 / 60 / 1000`
+- `MC_DAY = 24000`
+- `MC_HOUR = 24000 / 24`
+- `MC_MIN = 24000 / 24 / 60`
+- `MC_SEC = 24000 / 24 / 60 / 60`
+- `MC_MS = 24000 / 24 / 60 / 60 / 1000`
+
+
+### Quicksearch
+
+The quicksearch functionality allows you to quickly search for items - you can scroll the searchbar by dragging outside the list or using your scrollwheel.
+
+Clicking on a search element opens it's codex page.
+
+![](https://i.imgur.com/fQxQqrF.gif)
+
+Item descriptions are from the sources you chose during codex setup.
+
+## Contributing
+
+Want to add support for your mod? Check out the [data repository](https://github.com/mineblock11/Codex/tree/data) which stores all the item descriptions and other miscelaneous content. 
+
+*PS: The mod is All Rights Reserved currently as I do not see it fit for contributions. The data branch of the repository though is licensed by-file, not entirely as a whole. Please see `_index.json` for licensing of sources.*
