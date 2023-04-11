@@ -1,3 +1,5 @@
+***Codex has been archived. This is because of a lack of interest in it's development.***
+
 # Codex
 
 Codex allows you to gain information and do quick calculations in a Satisfactory-style codex screen.
