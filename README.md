@@ -1,4 +1,4 @@
-***Codex has been archived. This is because of a lack of interest in it's development.***
+# CODEX WILL BE REVISITED IN THE COMING MONTHS.
 
 # Codex
 
